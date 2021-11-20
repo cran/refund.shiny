@@ -9,7 +9,7 @@
 #' @param title plot title
 #' @param ... additional arguments passed to plotting functions
 #'
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu},
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu},
 #' Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
@@ -20,7 +20,7 @@
 #' @importFrom reshape2 melt
 #'
 #' @export
-#'
+#' @return No object is returned. This function takes in objects of class 'mfpca' and outputs a shiny application for that object.
 #'
 plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
@@ -61,11 +61,11 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
   levelVariance = lapply(1:2, function(i) round(sum(mfpca.obj$evalues[[i]])/(sum(mfpca.obj$evalues[[1]])+sum(mfpca.obj$evalues[[2]])), 3)*100)
 
-  scree.help1 = paste0("Scree plots for level 1; the left panel shows the plot of eigenvalues and the right panel shows the 
+  scree.help1 = paste0("Scree plots for level 1; the left panel shows the plot of eigenvalues and the right panel shows the
                       cumulative percent variance explained. Level 1 accounts for ", levelVariance[[1]], "% of total variance." )
-  scree.help2 = paste0("Scree plots for level 2; the left panel shows the plot of eigenvalues and the right panel shows the 
+  scree.help2 = paste0("Scree plots for level 2; the left panel shows the plot of eigenvalues and the right panel shows the
                       cumulative percent variance explained. Level 2 accounts for ", levelVariance[[2]], "% of total variance." )
-  
+
   #################################
   ## Tab 3:Linear combination of PCs
   #################################
@@ -125,20 +125,19 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
 
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"), 
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"),
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
-                    
                     tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),
                              tabsetPanel(
                                tabPanelModuleUI("muPC1", tabTitle = "Level 1", calls = muPC.call[[1]], helperText = muPC.help ),
-                               tabPanelModuleUI("muPC2", tabTitle = "Level 2", calls = muPC.call[[2]], helperText = muPC.help ) 
+                               tabPanelModuleUI("muPC2", tabTitle = "Level 2", calls = muPC.call[[2]], helperText = muPC.help )
                              ) ),
                     tabPanel("Scree Plot", icon = icon("medkit"),
                              tabsetPanel(
                                tabPanelModuleUI("scree1", tabTitle = "Level 1", helperText = scree.help1 ),
-                               tabPanelModuleUI("scree2", tabTitle = "Level 2", helperText = scree.help2 ) 
+                               tabPanelModuleUI("scree2", tabTitle = "Level 2", helperText = scree.help2 )
                               ) ),
-                    tabPanel("Linear Combinations", icon = icon("line-chart"), withMathJax(),
+                    tabPanel("Linear Combinations", icon = icon("chart-line"), withMathJax(),
                              column(3, h4("Sliders for Levels 1 and 2"),
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores
                                              specified using the sliders below. Black curve is population mean; blue curve
@@ -239,12 +238,12 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
             ggtitle(bquote(psi[.(PCchoice[[i]])]~(t) ~ "," ~.(100*round(mfpca.obj$evalues[[i]][PCchoice[[i]]]/sum(mfpca.obj$evalues[[i]]),3)) ~ "% Variance"))
         })
       })
-      
+
       plotInputMuPC1 <- reactive({ plotInputMuPC()[[1]] }) ; plotInputMuPC2 <- reactive({ plotInputMuPC()[[2]] })
 
       callModule(tabPanelModule, "muPC1", plotObject = plotInputMuPC1, plotName = "muPC1")
       callModule(tabPanelModule, "muPC2", plotObject = plotInputMuPC2, plotName = "muPC2")
-      
+
       #################################
       ## Code for scree plot
       #################################
@@ -260,7 +259,7 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       callModule(tabPanelModule, "scree1", plotObject = plotInputScree1, plotName = "scree1")
       callModule(tabPanelModule, "scree2", plotObject = plotInputScree2, plotName = "scree2")
-      
+
       #################################
       ## Code for linear combinations
       #################################
@@ -285,7 +284,7 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       })
       output$LinCom <- renderPlot( print(plotInputLinCom()) )
-      
+
       #################################
       ## Code for subject plots
       #################################

@@ -11,23 +11,26 @@ plot_shiny(obj, ...)
 
 \item{...}{additional arguments passed to plotting functions}
 }
+\value{
+This function outputs a shiny app based on the class of the input object.
+}
 \description{
 Interactive Plotting for Functional Data
 }
 \details{
 Function for interactive plotting of functional data analysis results.
 
-This package builds on the \code{refund} package: tools in \code{refund} are used to 
+This package builds on the \code{refund} package: tools in \code{refund} are used to
 conduct analyses and functions in this package create interactive visualizations of the results
 of those analyses. There are four major categories of analyses that can be viewed:
 \enumerate{
-\item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}}, 
+\item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}},
 \code{\link{fpca.ssvd}}, and \code{\link{fpca2s}}. Plots show the mean +/- 2SD times each FPC; scree plots;
 linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
 colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
-\item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the 
-mean +/- 2SD times each FPC; scree plots; linear combinations of score values and FPCs; 
+\item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the
+mean +/- 2SD times each FPC; scree plots; linear combinations of score values and FPCs;
 reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 #' \item{Longitudinal functional principal components analyses}
 }
@@ -35,7 +38,6 @@ reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 \examples{
 
 \dontrun{
-
 library(refund)
 library(dplyr)
 
@@ -45,41 +47,6 @@ data(cd4)
 SC = fpca.sc(cd4)
 plot_shiny(SC)
 
-##### FPCA Examples on simulated data #####
-
-set.seed(2678695)
-n = 101
-m = 101
-s1 = 20
-s2 = 10
-s = 4
-t = seq(-1, 1, l=m)
-v1 = t + sin(pi*t)
-v2 = cos(3*pi*t)
-V = cbind(v1/sqrt(sum(v1^2)), v2/sqrt(sum(v2^2)))
-U = matrix(rnorm(n*2), n, 2)
-D = diag(c(s1^2, s2^2))
-eps = matrix(rnorm(m*n, sd=s), n, m)
-Y = U\%*\%D\%*\%t(V) + eps
-
-SC = fpca.sc(Y)
-FACE = fpca.face(Y)
-SSVD = fpca.ssvd(Y, verbose=FALSE)
-S = fpca2s(Y)
- 
-plot_shiny(SC)
-plot_shiny(FACE)
-plot_shiny(SSVD)
-plot_shiny(S)
-
-#' ##### MFPCA Example #####
-
-data(DTI)
-Y = DTI$cca
-id = DTI$ID
-
-mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
-plot_shiny(mfpca.dti)
 
 ##### FoSR Example #####
 
@@ -112,33 +79,31 @@ plot_shiny(fosr.dti3$fpca.obj)
 data(DTI)
 MS <- subset(DTI, case ==1)  # subset data with multiple sclerosis (MS) case
 
-index.na <- which(is.na(MS$cca))  
+index.na <- which(is.na(MS$cca))
 Y <- MS$cca; Y[index.na] <- fpca.sc(Y)$Yhat[index.na]; sum(is.na(Y))
-id <- MS$ID 
-visit.index <- MS$visit 
+id <- MS$ID
+visit.index <- MS$visit
 visit.time <- MS$visit.time/max(MS$visit.time)
 
-lfpca.dti1 <- fpca.lfda(Y = Y, subject.index = id,  
-                       visit.index = visit.index, obsT = visit.time, 
+lfpca.dti1 <- fpca.lfda(Y = Y, subject.index = id,
+                       visit.index = visit.index, obsT = visit.time,
                        LongiModel.method = 'lme',
                        mFPCA.pve = 0.95)
 plot_shiny(lfpca.dti1)
 
-lfpca.dti2 <- fpca.lfda(Y = Y, subject.index = id,  
-                       visit.index = visit.index, obsT = visit.time, 
+lfpca.dti2 <- fpca.lfda(Y = Y, subject.index = id,
+                       visit.index = visit.index, obsT = visit.time,
                        LongiModel.method = 'fpca.sc',
                        mFPCA.pve = 0.80, sFPCA.pve = 0.80)
 plot_shiny(lfpca.dti2)
-
-
 }
 
-}
-\author{
-Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}, 
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+
 }
 \seealso{
 \code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
 }
-
+\author{
+Jeff Goldsmith \email{jeff.goldsmith@columbia.edu},
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
+}

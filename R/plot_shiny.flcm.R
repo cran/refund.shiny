@@ -10,7 +10,7 @@
 #' @param ... additional arguments passed to plotting functions
 #'
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu},
-#' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @import shiny
@@ -20,6 +20,7 @@
 #' @importFrom stats model.matrix terms
 #'
 #' @export
+#' @return No object is returned. This function takes in objects of class 'fosr' and outputs a shiny application for that object
 
 #utils::globalVariables(c("value", "subj", "covariate"))
 
@@ -48,7 +49,7 @@ plot_shiny.flcm = function(obj, xlab = "", ylab="", title = "", ...) {
   coef.list = colnames(model.matrix(flcm.obj$terms, flcm.obj$data.model[1,]))
   coefInputValues = 1:(p + 1)
   names(coefInputValues) = c("Show all", coef.list)
-  coef.help = "Coefficient function and confidence bounds for the predictor selected below."
+  coef.help = "Coefficient function for the predictor selected below."
   coef.call = eval(call("selectInput", inputId = "CoefChoice", label = ("Select Predictor"), choices = coefInputValues, selected = 1))
 
   ## Tab 4: plot of residual curves

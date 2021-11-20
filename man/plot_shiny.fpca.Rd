@@ -4,7 +4,7 @@
 \alias{plot_shiny.fpca}
 \title{Interactive Plotting for Functional Principal Component Analysis}
 \usage{
-\method{plot_shiny}{fpca}(obj, xlab = "", ylab = "", title = "", ...)
+\method{plot_shiny}{fpca}(obj, xlab = "", ylab = "", title = "", thin_data = FALSE, ...)
 }
 \arguments{
 \item{obj}{fpca object to be plotted.}
@@ -15,17 +15,21 @@
 
 \item{title}{plot title}
 
+\item{thin_data}{If TRUE data is thinned for each subject to make plotting faster. Defaults to FALSE.}
+
 \item{...}{additional arguments passed to plotting functions}
+}
+\value{
+No object is returned. This function takes in objects of class 'fpca' and outputs a shiny application for that object.
 }
 \description{
 Produces an interactive plot illustrating a functional principal component
 analysis.
 }
-\author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu},
-Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}
-}
 \seealso{
 \code{\link{plot_shiny}}
 }
-
+\author{
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu},
+Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}
+}

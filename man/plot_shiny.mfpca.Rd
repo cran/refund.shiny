@@ -17,15 +17,17 @@
 
 \item{...}{additional arguments passed to plotting functions}
 }
+\value{
+No object is returned. This function takes in objects of class 'mfpca' and outputs a shiny application for that object.
+}
 \description{
 Produces an interactive plot illustrating a multilevel functional principal component
 analysis.
 }
-\author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu},
-Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}
-}
 \seealso{
 \code{\link{plot_shiny}}
 }
-
+\author{
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu},
+Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}
+}

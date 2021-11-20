@@ -16,13 +16,13 @@
 #' @importFrom stats complete.cases setNames
 #' @examples
 #'
-#' \dontrun{
+#'
 #' library(ggplot2)
 #' library(refund)
 #'
 #' cca_df = as_refundObj(DTI$cca)
 #' ggplot(cca_df, aes(x = index, y = value, group = id)) + geom_line()
-#' }
+#'
 #'
 as_refundObj.matrix = function(obj, index = NULL, ...) {
 
@@ -45,7 +45,7 @@ as_refundObj.matrix = function(obj, index = NULL, ...) {
 
 	df = df[complete.cases(df),]
 
-	class(df) = c("data.frame", "refund_object")
+	class(df) = c("data.frame")
 
 	df
 }

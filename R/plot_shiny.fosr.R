@@ -10,7 +10,7 @@
 #' @param ... additional arguments passed to plotting functions
 #'
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu},
-#' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @import shiny
@@ -19,9 +19,8 @@
 #' @importFrom stats model.matrix terms
 #'
 #' @export
-
-#utils::globalVariables(c("value", "subj", "covariate"))
-
+#'
+#' @return No object is returned. This function takes in objects of class 'fosr' and outputs a shiny application for that object.
 
 plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
@@ -45,12 +44,12 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
   names(covarInputValues) = covar.list
   spaghetti.help = "Observed response data, colored according to the covariate selected below."
   spaghetti.call = eval(call("selectInput", inputId = "CovarChoice", label = ("Select Covariate"), choices = covarInputValues, selected = 1))
-  lasagna.help = "Observed response data, each row is a subject. When a covariate is selected, the rows are ordered and widths 
-                are assigned by value of that covariate. Right plot displays distribution of covariate selected in 
+  lasagna.help = "Observed response data, each row is a subject. When a covariate is selected, the rows are ordered and widths
+                are assigned by value of that covariate. Right plot displays distribution of covariate selected in
                 correspondence with ordering of the rows at right."
   lasagna.call = eval(call("selectInput", inputId = "CovarChoice2", label = ("Select Covariate"), choices = covarInputValues, selected = 1))
-  
-  
+
+
   ## Tab 2: fitted values
   pred.list = names(attributes(terms(fosr.obj$terms))$dataClasses)[-1]
   fitted.help = "Fitted response curve for a subject with covariate values specified below."
@@ -63,16 +62,16 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
   coef.list = colnames(model.matrix(fosr.obj$terms, fosr.obj$data[1,]))
   coefInputValues = 1:p
   names(coefInputValues) = coef.list
-  coef.help = "Coefficient function and confidence bounds for the predictor selected below."
+  coef.help = "Coefficient function for the predictor selected below."
   coef.call = eval(call("selectInput", inputId = "CoefChoice", label = ("Select Predictor"), choices = coefInputValues, selected = 1))
-  
+
   ## Tab 4: plot of residual curves
-  residuals.help = "If 'Show Outliers' is selected, the median and outlying curves are shown in blue and red respectively. If 'Rainbowize' 
-                    is selected, curves are ordered by band depth with most outlying curves shown in red and 
+  residuals.help = "If 'Show Outliers' is selected, the median and outlying curves are shown in blue and red respectively. If 'Rainbowize'
+                    is selected, curves are ordered by band depth with most outlying curves shown in red and
                     curves closest to the median shown in violet."
-  residuals.call = eval(call("radioButtons","residOptions", label="Plot Options", 
+  residuals.call = eval(call("radioButtons","residOptions", label="Plot Options",
                              choices = list("None"=1, "Show Median and Outliers"=2,"Rainbowize by Depth"=3), selected=1))
-  
+
   #################################
   ## App
   #################################
@@ -83,7 +82,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
 
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"), 
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"),
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
                     ##### start tabs
                     tabPanel("Observed Data", icon = icon("stats", lib = "glyphicon"),
@@ -93,8 +92,8 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
                                tabPanelModuleUI("lasagna", tabTitle = "Lasagna Plot", calls = lasagna.call,
                                                 helperText = lasagna.help)
                              ) ),
-                    tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("line-chart"), calls = fitted.call,helperText = fitted.help ),
-                    tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("area-chart"), calls = coef.call, helperText = coef.help),
+                    tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("chart-line"), calls = fitted.call,helperText = fitted.help ),
+                    tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("chart-area"), calls = coef.call, helperText = coef.help),
                     tabPanelModuleUI("residuals", tabTitle = "Residuals", icon("medkit"), calls = residuals.call,helperText = residuals.help )
                     ##### end tabs
                     ),
@@ -120,7 +119,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
         if(selected == "None") {
           y.obs.m$covariate = NULL
         } else {
-          y.obs.m$covariate = rep(fosr.obj$data[,selected], length(grid))
+           y.obs.m$covariate = rep(fosr.obj$data[,selected], length(grid))
         }
         #y.obs.m
 
@@ -133,27 +132,32 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
         }
       })
 
-      
+
       plotInputLasagna = reactive({
         y.obs.char = as.character(fosr.obj$terms[[2]]) ## gets character string which is name of outcome variable
-        
+
         CovarChoice2 = as.numeric(input$CovarChoice2)
         selected = covar.list[CovarChoice2]
         if(selected == "None") {
          covariate = NULL
-        } else {
+        }
+        else if(length(table(fosr.obj$data[, selected])) < 3){
+          fosr.obj$data[, selected] = factor(fosr.obj$data[, selected])
+          covariate = selected
+        }
+        else {
          covariate = selected
         }
-        
+
         df = makeLasagna(data = fosr.obj$data, outcome = y.obs.char, covariate = covariate)
         plots = bakeLasagna(data = fosr.obj$data, data.long = df$data.long, covariate = covariate)
-        
+
         grid.arrange(plots$lasagnaPlot, plots$densityPlot, ncol=2, nrow=1, widths=c(4, 1))
       })
-      
+
       callModule(tabPanelModule, "spaghetti", plotObject = plotInputSpagheti, plotName = "spaghetti")
       callModule(tabPanelModule, "lasagna", plotObject = plotInputLasagna, plotName = "lasagna", is.grid = TRUE)
-      
+
       #################################
       ## Code for FittedValues Tab
       #################################
@@ -186,7 +190,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
           xlab(xlab) + ylab(ylab) + ylim(c(.9, 1.1) * range(fosr.obj$Yhat))
 
       })
-      
+
       callModule(tabPanelModule, "fitted", plotObject = plotInputFittedVal, plotName = "fitted")
 
       #################################
@@ -207,9 +211,9 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
       })
 
-      
+
       callModule(tabPanelModule, "coef", plotObject = plotInputCoefFunc, plotName = "coef")
-      
+
       #################################
       ## Code for Residual plot
       #################################
@@ -259,7 +263,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
        callModule(tabPanelModule, "residuals", plotObject = plotInputResid, plotName = "residuals")
 
       ## add subject number
-  
+
     } ## end server
   )
 }
